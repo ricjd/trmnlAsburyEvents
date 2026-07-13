@@ -157,8 +157,8 @@ async function fetchUpcomingEvents(accessToken, calendarId) {
   return data.items || [];
 }
 
-export function buildAgenda(events, timezone) {
-  const todayKey = dayKeyInZone(new Date(), timezone);
+export function buildAgenda(events, timezone, now = new Date()) {
+  const todayKey = dayKeyInZone(now, timezone);
   const anchorUTC = dateKeyToUTC(todayKey);
 
   const dayKeyAtOffset = (offset) =>
@@ -177,18 +177,24 @@ export function buildAgenda(events, timezone) {
       };
     });
 
+  // Only ever consider events from today onward. In production this is
+  // already guaranteed by the Calendar API's timeMin=now, but buildAgenda
+  // shouldn't silently rely on that — it takes an injectable `now` for
+  // testing, and the two could diverge.
+  const futureEvents = enriched.filter((e) => e.dayKey >= todayKey);
+
   // Grow the window from MIN_DAYS until we hit the target event count, run
   // out of fetched events to gain, or hit the MAX_DAYS ceiling.
   let windowDays = MIN_DAYS;
   for (let n = MIN_DAYS; n <= MAX_DAYS; n++) {
     windowDays = n;
     const lastKey = dayKeyAtOffset(n - 1);
-    const count = enriched.filter((e) => e.dayKey <= lastKey).length;
-    if (count >= TARGET_EVENT_COUNT || count >= enriched.length) break;
+    const count = futureEvents.filter((e) => e.dayKey <= lastKey).length;
+    if (count >= TARGET_EVENT_COUNT || count >= futureEvents.length) break;
   }
 
   const windowLastKey = dayKeyAtOffset(windowDays - 1);
-  const inWindow = enriched.filter((e) => e.dayKey <= windowLastKey);
+  const inWindow = futureEvents.filter((e) => e.dayKey <= windowLastKey);
 
   const byDay = new Map();
   for (const e of inWindow) {
