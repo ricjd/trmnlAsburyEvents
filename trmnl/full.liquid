@@ -1,0 +1,41 @@
+{% comment %}
+  Full layout (800x480) — paste into the "Full" tab of the Markup Editor.
+  Data comes in via the webhook as merge variables:
+    days: [{ label, date, events: [{ title, time }, ...] }, ...]
+    window_days: number of days the agenda currently spans
+    generated_at: ISO timestamp
+{% endcomment %}
+<div class="layout">
+  <div class="columns">
+    <div class="column">
+      {% if days and days.size > 0 %}
+        {% for day in days %}
+          <div class="item item--emphasis-2">
+            <div class="content">
+              <span class="title title--small">{{ day.label }} &middot; {{ day.date }}</span>
+            </div>
+          </div>
+          {% for e in day.events %}
+            <div class="item">
+              <div class="meta">
+                <span class="label label--small">{{ e.time }}</span>
+              </div>
+              <div class="content">
+                <span class="title title--small">{{ e.title }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      {% else %}
+        <span class="label">No upcoming events.</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="title_bar">
+  <span class="title">Asbury Beach House</span>
+  <span class="instance">
+    {% if days and days.size > 0 %}Next {{ window_days }} days{% endif %}
+  </span>
+</div>

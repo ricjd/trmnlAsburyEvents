@@ -1,0 +1,15 @@
+{
+  "name": "trmnl-asbury-events",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker that pulls upcoming events from the Asbury Beach House Google Calendar and pushes an adaptive agenda to a TRMNL private plugin via webhook.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

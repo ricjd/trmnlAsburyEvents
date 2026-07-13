@@ -1,0 +1,52 @@
+{% comment %}
+  Half horizontal layout (800x240) — paste into the "Half horizontal" tab.
+  Short on height, so we only show the first two day-buckets that actually
+  have events, one per column, as compact single-line rows.
+{% endcomment %}
+<div class="layout">
+  <div class="columns">
+    {% assign day1 = days | first %}
+    {% assign rest = days | slice: 1, 10 %}
+    {% assign day2 = rest | first %}
+
+    <div class="column">
+      {% if day1 %}
+        <div class="item item--emphasis-2">
+          <div class="content">
+            <span class="title title--small">{{ day1.label }} &middot; {{ day1.date }}</span>
+          </div>
+        </div>
+        {% for e in day1.events %}
+          <div class="item">
+            <div class="content">
+              <span class="title title--small">{{ e.time }} &mdash; {{ e.title }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <span class="label">No upcoming events.</span>
+      {% endif %}
+    </div>
+
+    <div class="column">
+      {% if day2 %}
+        <div class="item item--emphasis-2">
+          <div class="content">
+            <span class="title title--small">{{ day2.label }} &middot; {{ day2.date }}</span>
+          </div>
+        </div>
+        {% for e in day2.events %}
+          <div class="item">
+            <div class="content">
+              <span class="title title--small">{{ e.time }} &mdash; {{ e.title }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="title_bar">
+  <span class="title">Beach House</span>
+</div>

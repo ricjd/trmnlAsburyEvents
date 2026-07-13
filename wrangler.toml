@@ -1,0 +1,16 @@
+name = "trmnl-asbury-events"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Runs hourly, at the top of the hour. Adjust to taste (cron syntax, UTC only).
+# https://developers.cloudflare.com/workers/configuration/cron-triggers/
+[triggers]
+crons = ["0 * * * *"]
+
+# Non-secret config. Secrets (service account key, webhook URL, auth token)
+# are set separately with `wrangler secret put` — see README.md.
+[vars]
+GOOGLE_CALENDAR_ID = "your_calendar_id@group.calendar.google.com"
+# IANA timezone the beach house is in, used to bucket events into days and
+# format displayed times. https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+TIMEZONE = "America/New_York"
