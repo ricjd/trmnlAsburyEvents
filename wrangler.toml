@@ -7,10 +7,10 @@ compatibility_date = "2024-11-01"
 [triggers]
 crons = ["0 * * * *"]
 
-# Non-secret config. Secrets (service account key, webhook URL, auth token)
-# are set separately with `wrangler secret put` — see README.md.
+# Non-secret config. The calendar ID and other secrets (service account
+# key, webhook URL, auth token) are set separately with
+# `wrangler secret put` — see README.md.
 [vars]
-GOOGLE_CALENDAR_ID = "your_calendar_id@group.calendar.google.com"
 # IANA timezone the beach house is in, used to bucket events into days and
 # format displayed times. https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 TIMEZONE = "America/New_York"

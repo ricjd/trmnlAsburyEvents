@@ -86,10 +86,8 @@ npm install
 npx wrangler login
 ```
 
-Edit `wrangler.toml`:
-- `GOOGLE_CALENDAR_ID` → the calendar ID from step 2.
-- `TIMEZONE` → the IANA timezone the house is in (default
-  `America/New_York`), used to bucket events into days and format times.
+Edit `wrangler.toml`'s `TIMEZONE` var if the house isn't in
+`America/New_York` — used to bucket events into days and format times.
 
 Set the secrets:
 
@@ -99,6 +97,7 @@ Set the secrets:
 # multi-line, so an interactive paste will silently truncate it.
 cat /path/to/service-account-key.json | npx wrangler secret put GOOGLE_SERVICE_ACCOUNT_JSON
 
+npx wrangler secret put GOOGLE_CALENDAR_ID   # the calendar ID from step 2
 npx wrangler secret put TRMNL_WEBHOOK_URL
 npx wrangler secret put WORKER_AUTH_TOKEN   # any random string, protects the manual /run endpoint
 ```
