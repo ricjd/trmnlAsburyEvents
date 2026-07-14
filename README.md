@@ -88,6 +88,9 @@ npx wrangler login
 
 Edit `wrangler.toml`'s `TIMEZONE` var if the house isn't in
 `America/New_York` — used to bucket events into days and format times.
+Edit `PLUGIN_TITLE` to rename the on-device title (e.g. "Family
+Calendar" instead of "Beach House") — no Liquid changes needed, all
+four templates read it from the webhook payload.
 
 Set the secrets:
 

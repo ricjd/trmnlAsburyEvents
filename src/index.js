@@ -61,6 +61,7 @@ async function run(env) {
         days: agenda.days,
         window_days: agenda.windowDays,
         event_count: agenda.eventCount,
+        plugin_title: env.PLUGIN_TITLE || "Beach House",
         generated_at: new Date().toISOString(),
       },
     }),

@@ -14,3 +14,6 @@ crons = ["0 * * * *"]
 # IANA timezone the beach house is in, used to bucket events into days and
 # format displayed times. https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 TIMEZONE = "America/New_York"
+# Shown as the title in the title_bar on-device. Change and redeploy to
+# rename (e.g. "Family Calendar") without touching the Liquid templates.
+PLUGIN_TITLE = "Beach House"
