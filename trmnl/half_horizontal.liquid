@@ -2,6 +2,9 @@
   Half horizontal layout (800x240) — paste into the "Half horizontal" tab.
   Short on height, so we only show the first two day-buckets that actually
   have events, one per column, as compact single-line rows.
+
+  lg: classes bump text size on TRMNL X (>=1024px); OG never reaches that
+  breakpoint so its appearance is unchanged.
 {% endcomment %}
 <div class="layout">
   <div class="columns">
@@ -13,13 +16,13 @@
       {% if day1 %}
         <div class="item bg--gray-70">
           <div class="content">
-            <span class="title title--small">{{ day1.label }} &middot; {{ day1.date }}</span>
+            <span class="title title--small lg:title--large">{{ day1.label }} &middot; {{ day1.date }}</span>
           </div>
         </div>
         {% for e in day1.events %}
           <div class="item">
             <div class="content">
-              <span class="title title--small">{{ e.time }} &mdash; {{ e.title }}</span>
+              <span class="title title--small lg:title--large">{{ e.time }} &mdash; {{ e.title }}</span>
             </div>
           </div>
         {% endfor %}
@@ -32,13 +35,13 @@
       {% if day2 %}
         <div class="item bg--gray-70">
           <div class="content">
-            <span class="title title--small">{{ day2.label }} &middot; {{ day2.date }}</span>
+            <span class="title title--small lg:title--large">{{ day2.label }} &middot; {{ day2.date }}</span>
           </div>
         </div>
         {% for e in day2.events %}
           <div class="item">
             <div class="content">
-              <span class="title title--small">{{ e.time }} &mdash; {{ e.title }}</span>
+              <span class="title title--small lg:title--large">{{ e.time }} &mdash; {{ e.title }}</span>
             </div>
           </div>
         {% endfor %}

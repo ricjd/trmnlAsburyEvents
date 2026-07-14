@@ -4,6 +4,10 @@
     days: [{ label, date, events: [{ title, time }, ...] }, ...]
     window_days: number of days the agenda currently spans
     generated_at: ISO timestamp
+
+  Same markup serves every device — lg: classes (Framework's >=1024px
+  breakpoint) bump text size up on TRMNL X's 1872x1404 canvas without
+  touching OG's 800x480, which never crosses that threshold.
 {% endcomment %}
 <div class="layout">
   <div class="columns">
@@ -12,14 +16,14 @@
         {% for day in days %}
           <div class="item bg--gray-70">
             <div class="content">
-              <span class="title title--small">{{ day.label }} &middot; {{ day.date }}</span>
+              <span class="title title--small lg:title--large">{{ day.label }} &middot; {{ day.date }}</span>
             </div>
           </div>
           {% for e in day.events %}
             <div class="item">
               <div class="content">
-                <span class="label label--small">{{ e.time }}</span>
-                <span class="title title--small">{{ e.title }}</span>
+                <span class="label label--small lg:label--large">{{ e.time }}</span>
+                <span class="title title--small lg:title--large">{{ e.title }}</span>
               </div>
             </div>
           {% endfor %}

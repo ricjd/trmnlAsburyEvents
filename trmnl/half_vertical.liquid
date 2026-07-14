@@ -1,6 +1,9 @@
 {% comment %}
   Half vertical layout (400x480) — paste into the "Half vertical" tab.
   Same structure as Full, just narrower — rows will wrap more.
+
+  lg: classes bump text size on TRMNL X (>=1024px); OG never reaches that
+  breakpoint so its appearance is unchanged.
 {% endcomment %}
 <div class="layout">
   <div class="columns">
@@ -9,14 +12,14 @@
         {% for day in days %}
           <div class="item bg--gray-70">
             <div class="content">
-              <span class="title title--small">{{ day.label }} &middot; {{ day.date }}</span>
+              <span class="title title--small lg:title--large">{{ day.label }} &middot; {{ day.date }}</span>
             </div>
           </div>
           {% for e in day.events %}
             <div class="item">
               <div class="content">
-                <span class="label label--small">{{ e.time }}</span>
-                <span class="title title--small">{{ e.title }}</span>
+                <span class="label label--small lg:label--large">{{ e.time }}</span>
+                <span class="title title--small lg:title--large">{{ e.title }}</span>
               </div>
             </div>
           {% endfor %}

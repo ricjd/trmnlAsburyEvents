@@ -1,6 +1,9 @@
 {% comment %}
   Quadrant layout (400x240) — paste into the "Quadrant" tab. Tightest space,
   so we highlight just the very next event and note how many more are coming.
+
+  lg: classes bump text size on TRMNL X (>=1024px); OG never reaches that
+  breakpoint so its appearance is unchanged.
 {% endcomment %}
 <div class="layout">
   <div class="columns">
@@ -10,12 +13,12 @@
         {% assign next_event = day1.events | first %}
         <div class="item">
           <div class="content">
-            <span class="value value--small">{{ next_event.title }}</span>
-            <span class="label">{{ day1.label }} &middot; {{ next_event.time }}</span>
+            <span class="value value--small lg:value--xlarge">{{ next_event.title }}</span>
+            <span class="label lg:label--large">{{ day1.label }} &middot; {{ next_event.time }}</span>
           </div>
         </div>
         {% if event_count > 1 %}
-          <span class="label label--small">+{{ event_count | minus: 1 }} more in the next {{ window_days }} days</span>
+          <span class="label label--small lg:label">+{{ event_count | minus: 1 }} more in the next {{ window_days }} days</span>
         {% endif %}
       {% else %}
         <span class="label">No upcoming events.</span>
