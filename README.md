@@ -18,11 +18,11 @@ duplicating the ~40 lines of Google auth code.
 
 The house calendar isn't evenly busy, so a fixed "next 2 days" or "next 7
 days" window would either look empty or get clipped depending on the week.
-Instead the Worker fetches the next 20 events (`MAX_EVENTS_FETCHED` in
+Instead the Worker fetches the next 25 events (`MAX_EVENTS_FETCHED` in
 `src/index.js`) and picks how many days to display:
 
 - Always show **at least 2 days** (`MIN_DAYS`).
-- If that doesn't add up to **~6 events** (`TARGET_EVENT_COUNT`), keep
+- If that doesn't add up to **~12 events** (`EXTENDED_EVENT_COUNT`), keep
   expanding the window a day at a time.
 - Stop expanding once the target is hit, there are no more fetched events
   left to gain, or the window hits a **14-day ceiling** (`MAX_DAYS`) —
@@ -31,12 +31,27 @@ Instead the Worker fetches the next 20 events (`MAX_EVENTS_FETCHED` in
 That ceiling is a deliberate tradeoff: if the calendar is very sparse (say,
 one event three weeks out and nothing else), the screen will show "no
 upcoming events" rather than a window that keeps growing to "next 3
-months." Adjust `MAX_DAYS`/`TARGET_EVENT_COUNT`/`MIN_DAYS` in
+months." Adjust `MAX_DAYS`/`EXTENDED_EVENT_COUNT`/`MIN_DAYS` in
 `src/index.js` if that tradeoff doesn't fit how the house actually gets
 used.
 
 Empty days inside the window aren't shown — only day-buckets that actually
 have at least one event get a header.
+
+### Two sizes of "fits on screen"
+
+`full` and `half_vertical` are full-height panels on both devices, but
+TRMNL X's canvas is dramatically taller than OG's fixed 800x480 / 400x480.
+Sending only enough data for OG's small canvas would leave TRMNL X mostly
+blank; sending enough for TRMNL X risks clipping on OG. So the Worker
+computes both: the full `days` array is sized to `EXTENDED_EVENT_COUNT`
+(~12, for TRMNL X), and `compact_day_count` marks how many of the leading
+day-buckets fit within `COMPACT_EVENT_COUNT` (~6, OG-safe). The `full` and
+`half_vertical` templates wrap everything past `compact_day_count` in a
+`hidden lg:visible` block — OG (which never reaches the `lg` breakpoint)
+never renders it; TRMNL X does. `quadrant` and `half_horizontal` ignore
+`compact_day_count` entirely since they already truncate to one event / two
+day-columns regardless of device.
 
 ## 1. Google Cloud: create a service account
 
@@ -128,7 +143,7 @@ Triggers → Cron Triggers → Trigger Event** in the Cloudflare dashboard.
 - `src/index.js` — the Worker. On each cron fire (or a manual `/run` hit)
   it signs a JWT with the service account's private key (via the Workers
   Web Crypto API), exchanges it for a Google OAuth access token, fetches up
-  to 20 events over the next 14 days, buckets them into calendar days using
+  to 25 events over the next 14 days, buckets them into calendar days using
   `Intl.DateTimeFormat` in the configured timezone (so a late-night event
   doesn't get miscounted into the next UTC day), runs the adaptive window
   logic described above, and POSTs the result to the TRMNL webhook as
@@ -136,7 +151,9 @@ Triggers → Cron Triggers → Trigger Event** in the Cloudflare dashboard.
 - `trmnl/*.liquid` — one Liquid template per layout size, each grouping
   events under day headers ("Today", "Tomorrow", "Fri" ...), sized to fit
   that layout's space. `half_horizontal` and `quadrant` only show the
-  first one or two day-buckets given their limited height.
+  first one or two day-buckets given their limited height. `full` and
+  `half_vertical` show every day-bucket, gating the OG-unsafe tail behind
+  `compact_day_count` (see "Two sizes of 'fits on screen'" above).
 
 ## Notes / things to revisit
 

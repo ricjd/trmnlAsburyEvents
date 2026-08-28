@@ -4,9 +4,15 @@
  * webhook as merge variables.
  *
  * Adaptive window: always show at least MIN_DAYS days. If that doesn't add
- * up to TARGET_EVENT_COUNT events, keep expanding day-by-day (up to
+ * up to EXTENDED_EVENT_COUNT events, keep expanding day-by-day (up to
  * MAX_DAYS) until it does, or until there are no more fetched events left
  * to gain by expanding further.
+ *
+ * Two of the four TRMNL layouts (full, half_vertical) get much taller
+ * canvases on TRMNL X than on OG, so the agenda is sized for the bigger
+ * screen and `compact_day_count` tells those templates how many leading
+ * day-buckets fit safely on OG's small fixed-pixel canvas — the rest are
+ * wrapped in a `hidden lg:visible` block that only TRMNL X reveals.
  *
  * Auth: Google service account (JWT Bearer flow), signed with the Workers
  * Web Crypto API — no googleapis/Node dependency required.
@@ -15,10 +21,11 @@
 const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 
-const MAX_EVENTS_FETCHED = 20; // "pull the next 20 events"
+const MAX_EVENTS_FETCHED = 25; // "pull the next 25 events"
 const MIN_DAYS = 2;
 const MAX_DAYS = 14;
-const TARGET_EVENT_COUNT = 6;
+const COMPACT_EVENT_COUNT = 6; // fits OG's small fixed-pixel canvases (full 800x480, half_vertical 400x480)
+const EXTENDED_EVENT_COUNT = 12; // total sent; the rest is revealed only on TRMNL X's taller canvases
 
 export default {
   async scheduled(_event, env, ctx) {
@@ -61,6 +68,7 @@ async function run(env) {
         days: agenda.days,
         window_days: agenda.windowDays,
         event_count: agenda.eventCount,
+        compact_day_count: agenda.compactDayCount,
         plugin_title: env.PLUGIN_TITLE || "Beach House",
         generated_at: new Date().toISOString(),
       },
@@ -184,14 +192,14 @@ export function buildAgenda(events, timezone, now = new Date()) {
   // testing, and the two could diverge.
   const futureEvents = enriched.filter((e) => e.dayKey >= todayKey);
 
-  // Grow the window from MIN_DAYS until we hit the target event count, run
+  // Grow the window from MIN_DAYS until we hit the extended event count, run
   // out of fetched events to gain, or hit the MAX_DAYS ceiling.
   let windowDays = MIN_DAYS;
   for (let n = MIN_DAYS; n <= MAX_DAYS; n++) {
     windowDays = n;
     const lastKey = dayKeyAtOffset(n - 1);
     const count = futureEvents.filter((e) => e.dayKey <= lastKey).length;
-    if (count >= TARGET_EVENT_COUNT || count >= futureEvents.length) break;
+    if (count >= EXTENDED_EVENT_COUNT || count >= futureEvents.length) break;
   }
 
   const windowLastKey = dayKeyAtOffset(windowDays - 1);
@@ -214,7 +222,18 @@ export function buildAgenda(events, timezone, now = new Date()) {
       };
     });
 
-  return { days, windowDays, eventCount: inWindow.length };
+  // How many leading day-buckets fit within COMPACT_EVENT_COUNT — the rest
+  // are still sent (for TRMNL X) but templates should gate them behind a
+  // `hidden lg:visible` wrapper so OG's small canvases don't overflow.
+  let compactDayCount = 0;
+  let compactEventTotal = 0;
+  for (const day of days) {
+    compactDayCount++;
+    compactEventTotal += day.events.length;
+    if (compactEventTotal >= COMPACT_EVENT_COUNT) break;
+  }
+
+  return { days, windowDays, eventCount: inWindow.length, compactDayCount };
 }
 
 function dayKeyInZone(date, timezone) {

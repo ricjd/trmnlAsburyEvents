@@ -8,19 +8,29 @@
   Same markup serves every device — lg: classes (Framework's >=1024px
   breakpoint) bump text size up on TRMNL X's 1872x1404 canvas without
   touching OG's 800x480, which never crosses that threshold.
+
+  OG's 800x480 canvas is fixed-height, but TRMNL X's is nearly 3x taller.
+  The worker sends more day-buckets than OG can safely fit
+  (compact_day_count marks the cutoff); the extra ones are wrapped in
+  `hidden lg:visible` so only TRMNL X reveals them.
 {% endcomment %}
 <div class="layout">
   <div class="columns">
     <div class="column">
       {% if days and days.size > 0 %}
         {% for day in days %}
-          <div class="item bg--gray-70">
+          {% if forloop.index0 >= compact_day_count %}
+            {% assign extra_class = " hidden lg:visible" %}
+          {% else %}
+            {% assign extra_class = "" %}
+          {% endif %}
+          <div class="item bg--gray-70{{ extra_class }}">
             <div class="content">
               <span class="title title--small lg:title--large">{{ day.label }} &middot; {{ day.date }}</span>
             </div>
           </div>
           {% for e in day.events %}
-            <div class="item">
+            <div class="item{{ extra_class }}">
               <div class="content">
                 <span class="label label--small lg:label--large">{{ e.time }}</span>
                 <span class="title title--small lg:title--large">{{ e.title }}</span>
