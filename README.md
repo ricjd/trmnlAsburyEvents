@@ -148,6 +148,12 @@ Triggers → Cron Triggers → Trigger Event** in the Cloudflare dashboard.
   doesn't get miscounted into the next UTC day), runs the adaptive window
   logic described above, and POSTs the result to the TRMNL webhook as
   `merge_variables`.
+- **It also runs trmnl-birthdays once a day.** The account's free plan allows
+  only 5 crons, so trmnl-birthdays has none: at 13:00 UTC
+  (`BIRTHDAYS_HOUR_UTC`) this Worker's cron calls its `DailyRun` entrypoint
+  through the `BIRTHDAYS` service binding in `wrangler.toml`. Deploy
+  trmnl-birthdays before this Worker. Removing this Worker or its hourly cron
+  stops the birthdays screen updating.
 - `trmnl/*.liquid` — one Liquid template per layout size, each grouping
   events under day headers ("Today", "Tomorrow", "Fri" ...), sized to fit
   that layout's space. `half_horizontal` and `quadrant` only show the
