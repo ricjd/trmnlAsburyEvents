@@ -7,6 +7,14 @@ compatibility_date = "2024-11-01"
 [triggers]
 crons = ["0 * * * *"]
 
+# trmnl-birthdays has no cron of its own (the free plan allows 5 per account):
+# the 13:00 UTC run of this cron calls its DailyRun entrypoint. Deploy
+# trmnl-birthdays first, so the entrypoint exists.
+[[services]]
+binding = "BIRTHDAYS"
+service = "trmnl-birthdays"
+entrypoint = "DailyRun"
+
 # Non-secret config. The calendar ID and other secrets (service account
 # key, webhook URL, auth token) are set separately with
 # `wrangler secret put` — see README.md.

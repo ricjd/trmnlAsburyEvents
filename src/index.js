@@ -27,9 +27,18 @@ const MAX_DAYS = 14;
 const COMPACT_EVENT_COUNT = 6; // fits OG's small fixed-pixel canvases (full 800x480, half_vertical 400x480)
 const EXTENDED_EVENT_COUNT = 12; // total sent; the rest is revealed only on TRMNL X's taller canvases
 
+// This hourly cron also runs trmnl-birthdays once a day (see wrangler.toml's
+// BIRTHDAYS service binding): the account's free plan allows only 5 crons.
+const BIRTHDAYS_HOUR_UTC = 13;
+
 export default {
-  async scheduled(_event, env, ctx) {
+  async scheduled(event, env, ctx) {
     ctx.waitUntil(run(env));
+    if (env.BIRTHDAYS && new Date(event.scheduledTime).getUTCHours() === BIRTHDAYS_HOUR_UTC) {
+      ctx.waitUntil(
+        env.BIRTHDAYS.run().catch((e) => console.error("trmnl-birthdays run failed:", e)),
+      );
+    }
   },
 
   async fetch(request, env) {
